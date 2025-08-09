@@ -5,38 +5,34 @@ class TestCase:
 	def setUp(self):
 		pass
 
+	def tearDown(self):
+		pass
+
 	def run(self):
-		method = getattr(self, self.name)
 		self.setUp()
+		method = getattr(self, self.name)
 		method()
+		self.tearDown()
 
 
 class WasRun(TestCase):
-	wasRun = False
-	wasSetUp = False
-
 	def setUp(self):
-		self.wasSetUp = True
+		self.log = "setup "
 
 	def testMethod(self):
-		self.wasRun = True
+		self.log += "testMethod "
+
+	def tearDown(self):
+		self.log += "tearDown "
 
 
 class TestCaseTest(TestCase):
-	def setUp(self):
-		self.test = WasRun("testMethod")
-
-	def testRunning(self):
-		assert not self.test.wasRun
-		self.test.run()
-		assert self.test.wasRun
-
-	def testSetup(self):
-		self.test.run()
-		assert self.test.wasSetUp
+	def testTemplateMethod(self):
+		test = WasRun("testMethod")
+		test.run()
+		assert test.log == "setup testMethod tearDown "
 
 
-TestCaseTest("testRunning").run()
-TestCaseTest("testSetup").run()
+TestCaseTest("testTemplateMethod").run()
 
 print("\033[92mGreen\033[0m")
