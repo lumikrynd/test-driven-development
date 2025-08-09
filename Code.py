@@ -12,30 +12,31 @@ class TestCase:
 
 
 class WasRun(TestCase):
-	def __init__(self, name):
-		self.wasRun = False
-		self.wasSetUp = False
-		TestCase.__init__(self, name)
-
-	def testMethod(self):
-		self.wasRun = True
+	wasRun = False
+	wasSetUp = False
 
 	def setUp(self):
 		self.wasSetUp = True
 
+	def testMethod(self):
+		self.wasRun = True
+
 
 class TestCaseTest(TestCase):
+	def setUp(self):
+		self.test = WasRun("testMethod")
+
 	def testRunning(self):
-		test = WasRun("testMethod")
-		assert not test.wasRun
-		test.run()
-		assert test.wasRun
+		assert not self.test.wasRun
+		self.test.run()
+		assert self.test.wasRun
 
 	def testSetup(self):
-		test = WasRun("testMethod")
-		test.run()
-		assert test.wasSetUp
+		self.test.run()
+		assert self.test.wasSetUp
 
 
 TestCaseTest("testRunning").run()
 TestCaseTest("testSetup").run()
+
+print("\033[92mGreen\033[0m")
