@@ -29,11 +29,10 @@ class TestCase:
 
 	def run(self):
 		result = TestResult()
-
 		result.testStarted()
-		self.setUp()
 
 		try:
+			self.setUp()
 			method = getattr(self, self.name)
 			method()
 		except:
@@ -78,6 +77,11 @@ class WasRun(TestCase):
 		raise Exception
 
 
+class BrokenSetup(WasRun):
+	def setUp(self):
+		raise Exception
+
+
 class TestCaseTest(TestCase):
 	def testTemplateMethod(self):
 		test = WasRun("testMethod")
@@ -101,9 +105,20 @@ class TestCaseTest(TestCase):
 		result = suite.run()
 		assert result.summary() == "2 run, 1 failed"
 
+	def testFailedSetup(self):
+		test = BrokenSetup("testMethod")
+		result = test.run()
+		assert result.summary() == "1 run, 1 failed"
+
 
 def runTestcaseTest(name):
 	suite.add(TestCaseTest(name))
+
+
+def runWithStackTrace(name):
+	test = TestCaseTest(name)
+	method = getattr(test, name)
+	method()
 
 
 suite = TestSuite()
@@ -112,9 +127,12 @@ runTestcaseTest("testTemplateMethod")
 runTestcaseTest("testResult")
 runTestcaseTest("testFailedResult")
 runTestcaseTest("testSuite")
+runTestcaseTest("testFailedSetup")
 
 finalResult = suite.run()
 print(finalResult.summary())
+
+runWithStackTrace("testFailedSetup")
 
 assert finalResult.errorCount == 0
 
