@@ -1,62 +1,5 @@
-class TestResult:
-	def __init__(self):
-		self.runCount = 0
-		self.errorCount = 0
-
-	def testStarted(self):
-		self.runCount += 1
-
-	def testFailed(self):
-		self.errorCount += 1
-
-	def addResult(self, other):
-		self.runCount += other.runCount
-		self.errorCount += other.errorCount
-
-	def summary(self):
-		return "%d run, %d failed" % (self.runCount, self.errorCount)
-
-
-class TestCase:
-	def __init__(self, name):
-		self.name = name
-
-	def setUp(self):
-		pass
-
-	def tearDown(self):
-		pass
-
-	def run(self):
-		result = TestResult()
-		result.testStarted()
-
-		try:
-			self.setUp()
-			method = getattr(self, self.name)
-			method()
-		except:
-			result.testFailed()
-
-		self.tearDown()
-
-		return result
-
-
-class TestSuite:
-	def __init__(self):
-		self.tests = []
-
-	def add(self, test):
-		self.tests.append(test)
-
-	def run(self):
-		result = TestResult()
-		for test in self.tests:
-			testResult = test.run()
-			result.addResult(testResult)
-
-		return result
+from kunit import TestCase
+from kunit import TestSuite
 
 
 class WasRun(TestCase):
@@ -112,16 +55,16 @@ class TestCaseTest(TestCase):
 
 	def testTearDownRunsOnError(self):
 		test = WasRun("testBrokenMethod")
-		result = test.run()
+		test.run()
 		assert test.log == "setup tearDown "
 
 	def testGetTestSuite(self):
 		suite = WasRun(None).getTestSuite()
 		result = suite.run()
 		assert result.summary() == "2 run, 1 failed"
-		pass
 
-def runTestcaseTest(name):
+
+def runTestCaseTest(name):
 	suite.add(TestCaseTest(name))
 
 
@@ -133,13 +76,13 @@ def runWithStackTrace(name):
 
 suite = TestSuite()
 
-runTestcaseTest("testTemplateMethod")
-runTestcaseTest("testResult")
-runTestcaseTest("testFailedResult")
-runTestcaseTest("testSuite")
-runTestcaseTest("testFailedSetup")
-runTestcaseTest("testTearDownRunsOnError")
-# runTestcaseTest("testGetTestSuite")
+runTestCaseTest("testTemplateMethod")
+runTestCaseTest("testResult")
+runTestCaseTest("testFailedResult")
+runTestCaseTest("testSuite")
+runTestCaseTest("testFailedSetup")
+runTestCaseTest("testTearDownRunsOnError")
+# runTestCaseTest("testGetTestSuite")
 
 finalResult = suite.run()
 print(finalResult.summary())
