@@ -26,14 +26,17 @@ class TestResult:
 
 
 class TestCase:
-	def __init__(self, name):
-		self._name = name
+	def __init__(self):
+		self._name = None
 
 	def setUp(self):
 		pass
 
 	def tearDown(self):
 		pass
+
+	def setName(self, name):
+		self._name = name
 
 	def run(self):
 		result = TestResult()
@@ -47,7 +50,6 @@ class TestCase:
 			result.testFailed()
 
 		self.tearDown()
-
 		return result
 
 	def getTestNames(self):
@@ -56,7 +58,9 @@ class TestCase:
 		return result
 
 	def getTestFor(self, name):
-		return self.__class__(name)
+		test = self.__class__()
+		test.setName(name)
+		return test
 
 	def getTestSuite(self):
 		suite = TestSuite()

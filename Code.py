@@ -3,9 +3,9 @@ from kunit import TestSuite
 
 
 class WasRun(TestCase):
-	def __init__(self, name):
+	def __init__(self):
 		self.log = ""
-		super().__init__(name)
+		super().__init__()
 
 	def setUp(self):
 		self.log += "setup "
@@ -26,59 +26,61 @@ class BrokenSetup(WasRun):
 
 
 class TestCaseTest(TestCase):
+	def _createWasRun(self, testName):
+		test = WasRun()
+		test.setName(testName)
+		return test
+
 	def test_TemplateMethod(self):
-		test = WasRun("test_Method")
+		test = self._createWasRun("test_Method")
 		test.run()
 		assert test.log == "setup test_Method tearDown "
 
 	def test_Result(self):
-		test = WasRun("test_Method")
+		test = self._createWasRun("test_Method")
 		result = test.run()
 		assert result.summary() == "1 run, 0 failed"
 
 	def test_FailedResult(self):
-		test = WasRun("test_BrokenMethod")
+		test = self._createWasRun("test_BrokenMethod")
 		result = test.run()
 		assert result.summary() == "1 run, 1 failed"
 
 	def test_Suite(self):
 		suite = TestSuite()
-		suite.add(WasRun("test_Method"))
-		suite.add(WasRun("test_BrokenMethod"))
+		suite.add(self._createWasRun("test_Method"))
+		suite.add(self._createWasRun("test_BrokenMethod"))
 		result = suite.run()
 		assert result.summary() == "2 run, 1 failed"
 
 	def test_FailedSetup(self):
-		test = BrokenSetup("test_Method")
+		test = BrokenSetup()
+		test.setName("test_Method")
 		result = test.run()
 		assert result.summary() == "1 run, 1 failed"
 
 	def test_TearDownRunsOnError(self):
-		test = WasRun("test_BrokenMethod")
+		test = self._createWasRun("test_BrokenMethod")
 		test.run()
 		assert test.log == "setup tearDown "
 
 	def test_GetTestNames(self):
-		result = WasRun(None).getTestNames()
+		result = WasRun().getTestNames()
 		assert "test_Method" in result
 		assert "test_BrokenMethod" in result
 		assert len(result) == 2
 
 	def test_GetTestFor(self):
 		name = "test_Method"
-		test = WasRun(None).getTestFor(name)
+		test = WasRun().getTestFor(name)
 		result = test.run()
 		assert test._name == name
 		assert result.summary() == "1 run, 0 failed"
 
 	def test_GetTestSuite(self):
-		suite = WasRun(None).getTestSuite()
+		suite = WasRun().getTestSuite()
 		result = suite.run()
 		assert result.summary() == "2 run, 1 failed"
-
-
-def runTestCaseTest(name):
-	suite.add(TestCaseTest(name))
 
 
 def runWithStackTrace(name):
@@ -87,19 +89,8 @@ def runWithStackTrace(name):
 	method()
 
 
-suite = TestSuite()
-
-runTestCaseTest("test_TemplateMethod")
-runTestCaseTest("test_Result")
-runTestCaseTest("test_FailedResult")
-runTestCaseTest("test_Suite")
-runTestCaseTest("test_FailedSetup")
-runTestCaseTest("test_TearDownRunsOnError")
-runTestCaseTest("test_GetTestNames")
-runTestCaseTest("test_GetTestFor")
-runTestCaseTest("test_GetTestSuite")
-
-finalResult = suite.run()
-print(finalResult.colourSummary())
+suite = TestCaseTest().getTestSuite()
+result = suite.run()
+print(result.colourSummary())
 
 # runWithStackTrace("testCase")
