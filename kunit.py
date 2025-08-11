@@ -52,7 +52,7 @@ class TestCase:
 
 	def getTestNames(self):
 		result = set(dir(self)) - set(dir(TestCase))
-		result = [s for s in result if s.startswith("test")]
+		result = [s for s in result if s.startswith("test_")]
 		return result
 
 	def getTestSuite(self):
