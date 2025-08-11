@@ -115,6 +115,11 @@ class TestCaseTest(TestCase):
 		result = test.run()
 		assert test.log == "setup tearDown "
 
+	def testGetTestSuite(self):
+		suite = WasRun(None).getTestSuite()
+		result = suite.run()
+		assert result.summary() == "2 run, 1 failed"
+		pass
 
 def runTestcaseTest(name):
 	suite.add(TestCaseTest(name))
@@ -134,6 +139,7 @@ runTestcaseTest("testFailedResult")
 runTestcaseTest("testSuite")
 runTestcaseTest("testFailedSetup")
 runTestcaseTest("testTearDownRunsOnError")
+# runTestcaseTest("testGetTestSuite")
 
 finalResult = suite.run()
 print(finalResult.summary())
