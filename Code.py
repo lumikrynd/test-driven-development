@@ -97,7 +97,7 @@ runTestCaseTest("test_FailedSetup")
 runTestCaseTest("test_TearDownRunsOnError")
 runTestCaseTest("test_GetTestNames")
 runTestCaseTest("test_GetTestFor")
-# runTestCaseTest("test_GetTestSuite")
+runTestCaseTest("test_GetTestSuite")
 
 finalResult = suite.run()
 print(finalResult.colourSummary())

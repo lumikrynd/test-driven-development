@@ -60,6 +60,8 @@ class TestCase:
 
 	def getTestSuite(self):
 		suite = TestSuite()
+		for name in self.getTestNames():
+			suite.add(self.getTestFor(name))
 		return suite
 
 
