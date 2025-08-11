@@ -110,6 +110,11 @@ class TestCaseTest(TestCase):
 		result = test.run()
 		assert result.summary() == "1 run, 1 failed"
 
+	def testTearDownRunsOnError(self):
+		test = WasRun("testBrokenMethod")
+		result = test.run()
+		assert test.log == "setup tearDown "
+
 
 def runTestcaseTest(name):
 	suite.add(TestCaseTest(name))
@@ -128,11 +133,12 @@ runTestcaseTest("testResult")
 runTestcaseTest("testFailedResult")
 runTestcaseTest("testSuite")
 runTestcaseTest("testFailedSetup")
+runTestcaseTest("testTearDownRunsOnError")
 
 finalResult = suite.run()
 print(finalResult.summary())
 
-runWithStackTrace("testFailedSetup")
+# runWithStackTrace("testCase")
 
 assert finalResult.errorCount == 0
 
