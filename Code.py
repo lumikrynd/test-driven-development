@@ -96,6 +96,6 @@ print(finalResult.summary())
 
 # runWithStackTrace("testCase")
 
-assert finalResult.errorCount == 0
+assert finalResult._errorCount == 0
 
 print("\033[92mGreen\033[0m")

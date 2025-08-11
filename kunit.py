@@ -1,25 +1,25 @@
 class TestResult:
 	def __init__(self):
-		self.runCount = 0
-		self.errorCount = 0
+		self._runCount = 0
+		self._errorCount = 0
 
 	def testStarted(self):
-		self.runCount += 1
+		self._runCount += 1
 
 	def testFailed(self):
-		self.errorCount += 1
+		self._errorCount += 1
 
 	def addResult(self, other):
-		self.runCount += other.runCount
-		self.errorCount += other.errorCount
+		self._runCount += other._runCount
+		self._errorCount += other._errorCount
 
 	def summary(self):
-		return "%d run, %d failed" % (self.runCount, self.errorCount)
+		return "%d run, %d failed" % (self._runCount, self._errorCount)
 
 
 class TestCase:
 	def __init__(self, name):
-		self.name = name
+		self._name = name
 
 	def setUp(self):
 		pass
@@ -33,7 +33,7 @@ class TestCase:
 
 		try:
 			self.setUp()
-			method = getattr(self, self.name)
+			method = getattr(self, self._name)
 			method()
 		except:
 			result.testFailed()
@@ -54,14 +54,14 @@ class TestCase:
 
 class TestSuite:
 	def __init__(self):
-		self.tests = []
+		self._tests = []
 
 	def add(self, test):
-		self.tests.append(test)
+		self._tests.append(test)
 
 	def run(self):
 		result = TestResult()
-		for test in self.tests:
+		for test in self._tests:
 			testResult = test.run()
 			result.addResult(testResult)
 
