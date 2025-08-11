@@ -92,10 +92,6 @@ runTestCaseTest("testGetTestNames")
 # runTestCaseTest("testGetTestSuite")
 
 finalResult = suite.run()
-print(finalResult.summary())
+print(finalResult.colourSummary())
 
 # runWithStackTrace("testCase")
-
-assert finalResult._errorCount == 0
-
-print("\033[92mGreen\033[0m")

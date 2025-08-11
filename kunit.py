@@ -16,6 +16,14 @@ class TestResult:
 	def summary(self):
 		return "%d run, %d failed" % (self._runCount, self._errorCount)
 
+	def colourSummary(self):
+		message = self.summary()
+		if (self._errorCount > 0):
+			message = "\033[31m%s\033[0m" % message
+		else:
+			message = "\033[92m%s\033[0m" % message
+		return message
+
 
 class TestCase:
 	def __init__(self, name):
