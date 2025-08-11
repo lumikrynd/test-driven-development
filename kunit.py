@@ -42,6 +42,11 @@ class TestCase:
 
 		return result
 
+	def getTestNames(self):
+		result = set(dir(self)) - set(dir(TestCase))
+		result = [s for s in result if s.startswith("test")]
+		return result
+
 	def getTestSuite(self):
 		suite = TestSuite()
 		return suite
@@ -61,4 +66,3 @@ class TestSuite:
 			result.addResult(testResult)
 
 		return result
-

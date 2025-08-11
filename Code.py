@@ -58,6 +58,12 @@ class TestCaseTest(TestCase):
 		test.run()
 		assert test.log == "setup tearDown "
 
+	def testGetTestNames(self):
+		result = WasRun(None).getTestNames()
+		assert "testMethod" in result
+		assert "testBrokenMethod" in result
+		assert len(result) == 2
+
 	def testGetTestSuite(self):
 		suite = WasRun(None).getTestSuite()
 		result = suite.run()
@@ -82,6 +88,7 @@ runTestCaseTest("testFailedResult")
 runTestCaseTest("testSuite")
 runTestCaseTest("testFailedSetup")
 runTestCaseTest("testTearDownRunsOnError")
+runTestCaseTest("testGetTestNames")
 # runTestCaseTest("testGetTestSuite")
 
 finalResult = suite.run()
