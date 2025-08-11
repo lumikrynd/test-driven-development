@@ -55,6 +55,9 @@ class TestCase:
 		result = [s for s in result if s.startswith("test_")]
 		return result
 
+	def getTestFor(self, name):
+		return self.__class__(name)
+
 	def getTestSuite(self):
 		suite = TestSuite()
 		return suite

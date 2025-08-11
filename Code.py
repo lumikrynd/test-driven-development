@@ -64,6 +64,13 @@ class TestCaseTest(TestCase):
 		assert "test_BrokenMethod" in result
 		assert len(result) == 2
 
+	def test_GetTestFor(self):
+		name = "test_Method"
+		test = WasRun(None).getTestFor(name)
+		result = test.run()
+		assert test._name == name
+		assert result.summary() == "1 run, 0 failed"
+
 	def test_GetTestSuite(self):
 		suite = WasRun(None).getTestSuite()
 		result = suite.run()
@@ -89,6 +96,7 @@ runTestCaseTest("test_Suite")
 runTestCaseTest("test_FailedSetup")
 runTestCaseTest("test_TearDownRunsOnError")
 runTestCaseTest("test_GetTestNames")
+runTestCaseTest("test_GetTestFor")
 # runTestCaseTest("test_GetTestSuite")
 
 finalResult = suite.run()
