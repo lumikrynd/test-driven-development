@@ -10,25 +10,25 @@ def is_test(func):
 
 class TestResult:
 	def __init__(self):
-		self._runCount = 0
-		self._errorCount = 0
+		self._run_count = 0
+		self._error_count = 0
 
-	def testStarted(self):
-		self._runCount += 1
+	def test_started(self):
+		self._run_count += 1
 
-	def testFailed(self):
-		self._errorCount += 1
+	def test_failed(self):
+		self._error_count += 1
 
-	def addResult(self, other):
-		self._runCount += other._runCount
-		self._errorCount += other._errorCount
+	def add_result(self, other):
+		self._run_count += other._run_count
+		self._error_count += other._error_count
 
 	def summary(self):
-		return "%d run, %d failed" % (self._runCount, self._errorCount)
+		return "%d run, %d failed" % (self._run_count, self._error_count)
 
-	def colourSummary(self):
+	def colour_summary(self):
 		message = self.summary()
-		if (self._errorCount > 0):
+		if (self._error_count > 0):
 			message = "\033[31m%s\033[0m" % message
 		else:
 			message = "\033[92m%s\033[0m" % message
@@ -39,43 +39,45 @@ class TestCase:
 	def __init__(self):
 		self._name = None
 
-	def setUp(self):
+	def setup(self):
 		pass
 
-	def tearDown(self):
+	def teardown(self):
 		pass
 
-	def setName(self, name):
+	def set_name(self, name):
 		self._name = name
 
 	def run(self):
 		result = TestResult()
-		result.testStarted()
+		result.test_started()
 
 		try:
-			self.setUp()
+			self.setup()
 			method = getattr(self, self._name)
 			method()
+		except AttributeError:
+			raise
 		except:
-			result.testFailed()
+			result.test_failed()
 
-		self.tearDown()
+		self.teardown()
 		return result
 
-	def getTestNames(self):
+	def get_test_names(self):
 		result = dir(self)
 		result = [s for s in result if is_test(getattr(self, s))]
 		return result
 
-	def getTestFor(self, name):
+	def get_test_for(self, name):
 		test = self.__class__()
-		test.setName(name)
+		test.set_name(name)
 		return test
 
-	def getTestSuite(self):
+	def get_test_suite(self):
 		suite = TestSuite()
-		for name in self.getTestNames():
-			suite.add(self.getTestFor(name))
+		for name in self.get_test_names():
+			suite.add(self.get_test_for(name))
 		return suite
 
 
@@ -89,7 +91,7 @@ class TestSuite:
 	def run(self):
 		result = TestResult()
 		for test in self._tests:
-			testResult = test.run()
-			result.addResult(testResult)
+			test_result = test.run()
+			result.add_result(test_result)
 
 		return result

@@ -5,14 +5,14 @@ class WasRun(TestCase):
 		self.log = ""
 		super().__init__()
 
-	def setUp(self):
+	def setup(self):
 		self.log += "setup "
 
-	def tearDown(self):
+	def teardown(self):
 		self.log += "tearDown "
 
 	@test
-	def test_Method(self):
+	def test_method(self):
 		self.log += "test_Method "
 
 	@test
@@ -23,103 +23,114 @@ class WasRun(TestCase):
 		pass
 
 	@test
-	def test_BrokenMethod(self):
+	def broken_test(self):
 		raise Exception
 
 
 class BrokenSetup(WasRun):
-	def setUp(self):
+	def setup(self):
 		raise Exception
 
 
 class TestCaseTest(TestCase):
 	def _createWasRun(self, testName):
 		test = WasRun()
-		test.setName(testName)
+		test.set_name(testName)
 		return test
 
 	@test
-	def test_TemplateMethod(self):
-		test = self._createWasRun("test_Method")
+	def correct_test_flow(self):
+		test = self._createWasRun("test_method")
 		test.run()
 		assert test.log == "setup test_Method tearDown "
 
 	@test
-	def test_Result(self):
-		test = self._createWasRun("test_Method")
+	def run_tests_are_counted(self):
+		test = self._createWasRun("test_method")
 		result = test.run()
 		assert result.summary() == "1 run, 0 failed"
 
 	@test
-	def test_FailedResult(self):
-		test = self._createWasRun("test_BrokenMethod")
+	def failed_tests_are_counted(self):
+		test = self._createWasRun("broken_test")
 		result = test.run()
 		assert result.summary() == "1 run, 1 failed"
 
 	@test
-	def test_Suite(self):
+	def wrong_test_name_causes_exception(self):
+		"""Show other tests would fail if wrong name for test method was used"""
+		test = self._createWasRun("non_existing_test")
+		try:
+			result = test.run()
+		except:
+			return
+
+		assert False
+
+	@test
+	def test_suite_runs_contained_tests(self):
 		suite = TestSuite()
-		suite.add(self._createWasRun("test_Method"))
-		suite.add(self._createWasRun("test_BrokenMethod"))
+		suite.add(self._createWasRun("test_method"))
+		suite.add(self._createWasRun("broken_test"))
 		result = suite.run()
 		assert result.summary() == "2 run, 1 failed"
 
 	@test
-	def test_FailedSetup(self):
+	def failed_setup_causes_test_fail(self):
 		test = BrokenSetup()
-		test.setName("test_Method")
+		test.set_name("test_method")
 		result = test.run()
 		assert result.summary() == "1 run, 1 failed"
 
 	@test
-	def test_TearDownRunsOnError(self):
-		test = self._createWasRun("test_BrokenMethod")
+	def teardown_runs_on_error(self):
+		test = self._createWasRun("broken_test")
 		test.run()
 		assert test.log == "setup tearDown "
 
 	@test
-	def test_GetTestNames(self):
-		result = WasRun().getTestNames()
-		assert "test_Method" in result
-		assert "test_BrokenMethod" in result
+	def test_get_test_names(self):
+		result = WasRun().get_test_names()
+		assert "test_method" in result
+		assert "broken_test" in result
 		assert "marked_test" in result
 		assert len(result) == 3
 
 	@test
-	def test_GetTestFor(self):
-		name = "test_Method"
-		test = WasRun().getTestFor(name)
+	def test_get_test_for(self):
+		name = "test_method"
+		test = WasRun().get_test_for(name)
 		result = test.run()
 		assert test._name == name
 		assert result.summary() == "1 run, 0 failed"
 
 	@test
-	def test_GetTestSuite(self):
-		suite = WasRun().getTestSuite()
+	def create_test_suite_from_test_class(self):
+		suite = WasRun().get_test_suite()
 		result = suite.run()
 		assert result.summary() == "3 run, 1 failed"
 
 	@test
-	def test_not_marked_as_test(self):
+	def normal_function_not_marked_as_test(self):
 		test_class = WasRun()
 		test = test_class.not_a_test
 		assert not is_test(test)
 
 	@test
-	def test_marked_as_test(self):
+	def test_method_marked_as_test(self):
 		test_class = WasRun()
 		test = test_class.marked_test
 		assert is_test(test)
 
 
-def runWithStackTrace(name):
+def run_with_stack_trace(name):
 	test = TestCaseTest()
 	method = getattr(test, name)
 	method()
 
 
-suite = TestCaseTest().getTestSuite()
+suite = TestCaseTest().get_test_suite()
 result = suite.run()
-print(result.colourSummary())
+print(result.colour_summary())
 
-# runWithStackTrace("testCase")
+# run_with_stack_trace("test_case")
