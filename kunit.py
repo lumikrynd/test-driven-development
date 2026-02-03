@@ -1,3 +1,13 @@
+def test(func):
+	func.__is_test__ = True
+	return func
+
+def is_test(func):
+	try:
+		return func.__is_test__
+	except AttributeError:
+		return False
+
 class TestResult:
 	def __init__(self):
 		self._runCount = 0
@@ -53,8 +63,8 @@ class TestCase:
 		return result
 
 	def getTestNames(self):
-		result = set(dir(self)) - set(dir(TestCase))
-		result = [s for s in result if s.startswith("test_")]
+		result = dir(self)
+		result = [s for s in result if is_test(getattr(self, s))]
 		return result
 
 	def getTestFor(self, name):
