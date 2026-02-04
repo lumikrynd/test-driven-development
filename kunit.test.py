@@ -1,3 +1,4 @@
+from collections import Counter
 from kunit import test, is_test, TestCase, TestSuite
 
 class WasRun(TestCase):
@@ -109,6 +110,7 @@ class TestCaseTest(TestCase):
 		suite = WasRun().get_test_suite()
 		result = suite.run()
 		assert result.summary() == "3 run, 1 failed"
+		assert Counter(result.failed_tests()) == Counter(["broken_test"])
 
 	@test
 	def normal_function_not_marked_as_test(self):
@@ -131,6 +133,6 @@ def run_with_stack_trace(name):
 
 suite = TestCaseTest().get_test_suite()
 result = suite.run()
-print(result.colour_summary())
+print(result.colour_result())
 
 # run_with_stack_trace("test_case")

@@ -8,31 +8,67 @@ def is_test(func):
 	except AttributeError:
 		return False
 
+INDENT = "    "
+
 class TestResult:
 	def __init__(self):
 		self._run_count = 0
-		self._error_count = 0
+		self._errors = []
 
 	def test_started(self):
 		self._run_count += 1
 
-	def test_failed(self):
-		self._error_count += 1
+	def test_failed(self, name, err):
+		self._errors.append((name, err))
 
 	def add_result(self, other):
 		self._run_count += other._run_count
-		self._error_count += other._error_count
+		self._errors.extend(other._errors)
+
+	def _error_count(self):
+		return len(self._errors)
+
+	def failed_tests(self):
+		temp = map(lambda x: x[0], self._errors)
+		return list(temp)
 
 	def summary(self):
-		return "%d run, %d failed" % (self._run_count, self._error_count)
+		error_count = self._error_count()
+		return "%d run, %d failed" % (self._run_count, error_count)
 
-	def colour_summary(self):
-		message = self.summary()
-		if (self._error_count > 0):
-			message = "\033[31m%s\033[0m" % message
-		else:
-			message = "\033[92m%s\033[0m" % message
-		return message
+	def _errors_summary(self):
+		indented = map(lambda x: INDENT + x, self.failed_tests())
+		error_names = '\n'.join(indented)
+		error_names = "Failed tests:\n" + error_names
+		return error_names
+
+	def _format_error(err_info):
+		result = "Test: " + err_info[0]
+
+		err = err_info[1]
+		result += "\n" + INDENT + type(err).__name__
+
+		msg = str(err)
+		if (len(msg) > 0):
+			result += "\n" + INDENT + msg
+
+		return result
+
+	def _errors_long(self):
+		temp = map(lambda x: TestResult._format_error(x), self._errors)
+		return "\n\n".join(temp)
+
+	def colour_result(self):
+		summary = self.summary()
+		error_count = self._error_count()
+		if (error_count == 0):
+			return "\033[92m%s\033[0m" % summary
+
+		summary = "\033[31m%s\033[0m" % summary
+		errors_summary = self._errors_summary()
+		errors_info = self._errors_long()
+
+		return errors_info + "\n\n\n" + errors_summary + "\n\n" + summary
 
 
 class TestCase:
@@ -58,14 +94,14 @@ class TestCase:
 			method()
 		except AttributeError:
 			raise
-		except:
-			result.test_failed()
+		except Exception as err:
+			result.test_failed(self._name, err)
 
 		self.teardown()
 		return result
 
 	def get_test_names(self):
-		result = dir(self)
+		result = set(dir(self)) - set(dir(TestCase))
 		result = [s for s in result if is_test(getattr(self, s))]
 		return result
 
